@@ -1,3 +1,18 @@
+let totalPages = 9; // Define total number of pages
+
+const historicalEventsData = [
+    { id: "event1", text: "Independencia de las Trece Colonias británicas", year: 1776, correctOrder: 1 },
+    { id: "event2", text: "Invasión napoleónica a España", year: 1808, correctOrder: 2 },
+    { id: "event3", text: "Redacción de la Constitución de Cádiz", year: 1812, correctOrder: 3 },
+    { id: "event4", text: "Finalización de la mayoría de las guerras de independencia americanas", year: "1823-1833", correctOrder: 4 },
+    { id: "event5", text: "Revolución Gloriosa", year: 1868, correctOrder: 5 },
+    { id: "event6", text: "Aprobación de la Constitución del Sexenio Democrático", year: 1869, correctOrder: 6 },
+    { id: "event7", text: "Instauración del sistema político de la Restauración", year: 1874, correctOrder: 7 },
+    { id: "event8", text: "Fundación del Partido Socialista Obrero Español (PSOE)", year: 1879, correctOrder: 8 },
+    { id: "event9", text: "Pérdida de las últimas colonias", year: 1898, correctOrder: 9 },
+    { id: "event10", text: "Golpe de Estado de Primo de Rivera", year: 1923, correctOrder: 10 }
+];
+
 // Function to show a specific page by loading its HTML content
 async function showPage(pageId) {
     const appContainer = document.getElementById('app-container');
@@ -24,6 +39,8 @@ async function showPage(pageId) {
             showContent('page5', 'content1_p5_study', document.querySelector('#page5 .content-button:first-child'));
         } else if (pageId === 'page7') {
             showContent('page7', 'content1_p7_study', document.querySelector('#page7 .content-button:first-child'));
+        } else if (pageId === 'page9') {
+            initPage9(); // Initialize the event ordering game
         }
 
     } catch (error) {
@@ -35,19 +52,25 @@ async function showPage(pageId) {
 
 // Function to update the page number display
 function updatePageNumber(pageId) {
-    const pageNumberMap = {
-        'page1': '1/8',
-        'page2': '2/8',
-        'page3': '3/8',
-        'page4': '4/8',
-        'page5': '5/8',
-        'page6': '6/8',
-        'page7': '7/8',
-        'page8': '8/8'
-    };
-    const currentPageNumberElement = document.getElementById(`page-number-${pageId.replace('page', '')}`);
-    if (currentPageNumberElement) {
-        currentPageNumberElement.textContent = pageNumberMap[pageId];
+    const pageNum = pageId.replace('page', '');
+    const displayString = `${pageNum}/${totalPages}`;
+
+    // Try the new common ID first (used in page9.html and potentially others)
+    const commonDisplayElement = document.getElementById('page-number-display');
+    if (commonDisplayElement) {
+        commonDisplayElement.textContent = displayString;
+    } else {
+        // Fallback to old individual IDs if the common one isn't found on the current page
+        const specificDisplayElement = document.getElementById(`page-number-${pageNum}`);
+        if (specificDisplayElement) {
+            specificDisplayElement.textContent = displayString;
+        } else {
+             // Attempt to find any span with a page-number class if specific IDs fail (more robust for future pages)
+            const genericPageNumberElement = document.querySelector('.page-number');
+            if(genericPageNumberElement) {
+                genericPageNumberElement.textContent = displayString;
+            }
+        }
     }
 }
 
@@ -365,6 +388,156 @@ function getCorrectOptionText(form, questionName, correctValue) {
 
     return `Opción ${correctValue.toUpperCase()}`;
 }
+
+// --- Page 9: Event Ordering Game Functions ---
+
+function initPage9() {
+    const sourceContainer = document.getElementById('event-source-container');
+    const targetContainer = document.getElementById('event-target-container');
+    const feedbackMessage = document.getElementById('feedback-message');
+
+    if (!sourceContainer || !targetContainer || !feedbackMessage) {
+        console.error('Required elements for Page 9 game not found.');
+        return;
+    }
+
+    // Clear previous state
+    sourceContainer.innerHTML = '';
+    targetContainer.innerHTML = '';
+    feedbackMessage.innerHTML = '&nbsp;';
+    feedbackMessage.className = 'mt-4 text-lg font-semibold h-6'; // Reset class
+
+    // Shuffle and display events
+    const shuffledEvents = [...historicalEventsData].sort(() => Math.random() - 0.5);
+
+    shuffledEvents.forEach(event => {
+        const eventDiv = document.createElement('div');
+        eventDiv.id = event.id;
+        eventDiv.className = 'event-item'; // Apply specific styling for event items
+        eventDiv.draggable = true;
+        eventDiv.textContent = event.text;
+        eventDiv.addEventListener('dragstart', drag);
+        sourceContainer.appendChild(eventDiv);
+    });
+}
+
+function drag(event) {
+    event.dataTransfer.setData('text/plain', event.target.id);
+    event.target.classList.add('dragging');
+}
+
+function allowDrop(event) {
+    event.preventDefault(); // Necessary to allow dropping
+}
+
+function dragEnterTarget(event) {
+    if (event.target.id === 'event-target-container') {
+        event.target.classList.add('drag-over-target');
+    }
+}
+
+function dragLeaveTarget(event) {
+    if (event.target.id === 'event-target-container') {
+        event.target.classList.remove('drag-over-target');
+    }
+}
+
+function drop(event) {
+    event.preventDefault();
+    const eventId = event.dataTransfer.getData('text/plain');
+    const draggableElement = document.getElementById(eventId);
+    const dropZone = document.getElementById('event-target-container');
+
+    if (draggableElement && dropZone) {
+        // If the drop target is the container itself, append the element
+        if (event.target.id === 'event-target-container') {
+            dropZone.appendChild(draggableElement);
+        }
+        // If the drop target is an existing event-item within the dropZone, insert before it
+        else if (event.target.classList.contains('event-item') && event.target.parentElement.id === 'event-target-container') {
+            dropZone.insertBefore(draggableElement, event.target);
+        }
+        // Fallback to append if dropped in a weird spot inside the zone but not on an item
+        else if (event.target.closest('#event-target-container')) {
+            dropZone.appendChild(draggableElement);
+        }
+    }
+    if(draggableElement) draggableElement.classList.remove('dragging');
+    if(dropZone) dropZone.classList.remove('drag-over-target');
+    clearFeedbackAndYears(); // Clear feedback if user rearranges items
+}
+
+function clearFeedbackAndYears() {
+    const feedbackElement = document.getElementById('feedback-message');
+    if (feedbackElement) {
+        feedbackElement.innerHTML = '&nbsp;';
+        feedbackElement.className = 'mt-4 text-lg font-semibold h-6'; // Reset class
+    }
+
+    const itemsInTarget = document.getElementById('event-target-container').children;
+    Array.from(itemsInTarget).forEach(item => {
+        const yearSpan = item.querySelector('.event-year-display');
+        if (yearSpan) {
+            yearSpan.remove();
+        }
+        // Restore original text if it was modified (not strictly necessary if only appending year)
+        const eventData = historicalEventsData.find(e => e.id === item.id);
+        if (eventData && item.firstChild.nodeType === Node.TEXT_NODE) {
+             // Only update if the first child is a text node, to avoid messing up if other elements were added
+            item.firstChild.textContent = eventData.text; 
+        }
+    });
+}
+
+function checkOrderAndShowYears() {
+    clearFeedbackAndYears();
+    const targetContainer = document.getElementById('event-target-container');
+    const feedbackElement = document.getElementById('feedback-message');
+
+    if (!targetContainer || !feedbackElement) return;
+
+    const orderedItems = Array.from(targetContainer.children);
+    let isCorrect = true;
+
+    if (orderedItems.length !== historicalEventsData.length) {
+        isCorrect = false; // Not all items have been placed
+    }
+
+    for (let i = 0; i < orderedItems.length; i++) {
+        const item = orderedItems[i];
+        const eventData = historicalEventsData.find(e => e.id === item.id);
+        if (!eventData || eventData.correctOrder !== (i + 1)) {
+            isCorrect = false;
+        }
+        // Add year span
+        if (eventData) {
+            // Remove any existing year span before adding a new one
+            const existingYearSpan = item.querySelector('.event-year-display');
+            if (existingYearSpan) existingYearSpan.remove();
+
+            const yearSpan = document.createElement('span');
+            yearSpan.className = 'event-year-display';
+            yearSpan.textContent = ` (${eventData.year})`;
+            item.appendChild(yearSpan);
+        }
+    }
+
+    if (orderedItems.length === 0) {
+        feedbackElement.textContent = 'Arrastra los eventos para ordenarlos.';
+        feedbackElement.className = 'mt-4 text-lg font-semibold h-6 text-blue-600';
+    } else if (isCorrect && orderedItems.length === historicalEventsData.length) {
+        feedbackElement.textContent = '¡Correcto! 🎉';
+        feedbackElement.className = 'mt-4 text-lg font-semibold h-6 text-green-600';
+    } else if (!isCorrect && orderedItems.length === historicalEventsData.length){
+        feedbackElement.textContent = 'Incorrecto, revisa el orden y vuelve a intentarlo.';
+        feedbackElement.className = 'mt-4 text-lg font-semibold h-6 text-red-600';
+    } else {
+        feedbackElement.textContent = 'Algunos eventos faltan o el orden es incorrecto.';
+        feedbackElement.className = 'mt-4 text-lg font-semibold h-6 text-yellow-600';
+    }
+}
+
+// --- End of Page 9 Functions ---
 
 // Initial page load
 document.addEventListener('DOMContentLoaded', () => {

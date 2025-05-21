@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia de España: El Juego del Conocimiento - Ordenar Eventos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos adicionales para el drag and drop */
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #cbd5e0; /* Tailwind's gray-300 */
+        }
+        .drag-over-target {
+            background-color: #ebf8ff; /* Tailwind's blue-100 */
+            border: 2px dashed #90cdf4; /* Tailwind's blue-400 */
+        }
+        .event-item {
+            cursor: grab;
+            padding: 0.75rem; /* p-3 */
+            margin-bottom: 0.5rem; /* my-2 equivalent */
+            background-color: #e0f2fe; /* bg-sky-100 (Tailwind v3+) or a light blue */
+            border: 1px solid #bae6fd; /* border-sky-200 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .event-item:hover {
+            background-color: #bee3f8; /* bg-sky-200 */
+        }
+        .event-year-display {
+            font-weight: bold;
+            color: #c53030; /* Tailwind's red-700 */
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-yellow-50 text-gray-800 font-serif flex flex-col min-h-screen">
+
+    <div id="page9" class="page-container flex-grow container mx-auto p-4">
+        <!-- Navegación Superior -->
+        <div class="flex justify-between items-center mb-4">
+            <button class="nav-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showPage('page8')">&larr; Atrás</button>
+            <span id="page-number-display" class="text-xl font-bold">9/9</span>
+            <button class="nav-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="showPage('page1')">Inicio &rarr;</button>
+        </div>
+
+        <h1 class="text-3xl font-bold text-center text-red-700 mb-6">Ordena los Eventos Históricos</h1>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Columna Izquierda: Eventos Desordenados -->
+            <div class="w-full md:w-1/2 bg-gray-100 p-4 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-3 text-center">Eventos Históricos Desordenados</h2>
+                <p class="text-sm text-gray-600 mb-3 text-center">Arrastra los eventos a la columna de la derecha.</p>
+                <div id="event-source-container" class="space-y-2 min-h-[300px] p-2 border-2 border-dashed border-gray-300 rounded">
+                    <!-- Los eventos se cargarán aquí por JavaScript -->
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Zona para Ordenar -->
+            <div class="w-full md:w-1/2 bg-gray-100 p-4 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-3 text-center">Arrastrar aquí para ordenarlos cronológicamente</h2>
+                <div id="event-target-container" class="space-y-2 min-h-[300px] p-2 border-2 border-dashed border-blue-400 rounded bg-white" ondragover="allowDrop(event)" ondrop="drop(event)" ondragenter="dragEnterTarget(event)" ondragleave="dragLeaveTarget(event)">
+                    <!-- Los eventos arrastrados aparecerán aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de Corrección y Mensaje de Retroalimentación -->
+        <div class="text-center mt-8">
+            <button id="check-order-button" class="bg-red-600 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg text-lg" onclick="checkOrderAndShowYears()">
+                Corregir Orden y Mostrar Años
+            </button>
+            <p id="feedback-message" class="mt-4 text-lg font-semibold h-6">&nbsp;</p> <!-- Espacio para el mensaje, h-6 para altura fija -->
+        </div>
+
+        <!-- Navegación Inferior -->
+        <div class="flex justify-between items-center mt-8 pt-4 border-t border-gray-300">
+            <button class="nav-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showPage('page8')">&larr; Atrás</button>
+            <button class="nav-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="showPage('page1')">Inicio &rarr;</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
