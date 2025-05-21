@@ -63,8 +63,7 @@ function showContent(pageId, contentId, clickedButton) {
     // Obtener el contenedor de la página actual
     const currentPageContainer = document.getElementById(pageId);
     if (!currentPageContainer) {
-        // eslint-disable-next-line no-console
-        console.error(`No se encontró el contenedor con ID: ${pageId}`);
+        // Si el contenedor no existe, retorna silenciosamente
         return;
     }
 
