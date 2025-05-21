@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicación educativa para aprender sobre la Historia de España. Incluye lecciones interactivas, tarjetas de estudio y cuestionarios.">
+    <meta name="keywords" content="Historia de España, educación, aprendizaje interactivo, PAU, selectividad, tarjetas de estudio, cuestionarios">
+    <meta name="author" content="Tu Nombre o Institución">
+    <meta name="theme-color" content="#1e40af">
+    
+    <title>Historia de España: El Juego del Conocimiento</title>
+    
+    <!-- Preload de fuentes y recursos críticos -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"></noscript>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    
+    <!-- Meta para redes sociales -->
+    <meta property="og:title" content="Historia de España: El Juego del Conocimiento">
+    <meta property="og:description" content="Aprende Historia de España de forma interactiva con lecciones y cuestionarios">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tudominio.com">
+    <meta property="og:image" content="https://tudominio.com/images/og-image.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Historia de España: El Juego del Conocimiento">
+    <meta name="twitter:description" content="Aprende Historia de España de forma interactiva con lecciones y cuestionarios">
+    <meta name="twitter:image" content="https://tudominio.com/images/twitter-image.jpg">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            flex-direction: column; /* Allow vertical stacking */
+            justify-content: flex-start; /* Align to top */
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        /* Styles for the main container that will hold page content */
+        .page-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-top: 50px;
+            position: relative; /* Needed for absolute positioning of nav buttons */
+        }
+
+        /* Common styles for nav buttons and page numbers */
+        .nav-button {
+            background-color: #10b981; /* Green button */
+            color: white;
+            padding: 6px 10px; /* Smaller padding */
+            border-radius: 8px; /* Slightly less rounded for smaller size */
+            font-size: 0.8em; /* Smaller font size */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none; /* Remove default button border */
+        }
+        .nav-button:hover {
+            background-color: #059669; /* Darker green on hover */
+        }
+        .nav-top-left, .nav-top-right, .nav-bottom-left, .nav-bottom-right {
+            position: absolute;
+            padding: 10px; /* Add some padding around the buttons */
+            z-index: 10; /* Ensure buttons are above other content */
+        }
+        .nav-top-left { top: 0; left: 0; }
+        .nav-top-right { top: 0; right: 0; }
+        .nav-bottom-left { bottom: 0; left: 0; }
+        .nav-bottom-right { bottom: 0; right: 0; }
+
+        .page-number {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            color: #6b7280; /* Gray color */
+            z-index: 10;
+            background-color: #e2e8f0; /* Light gray background for readability */
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 25px;
+                margin-top: 20px;
+            }
+            .nav-button {
+                padding: 4px 8px; /* Even smaller padding for mobile buttons */
+                font-size: 0.7em; /* Even smaller font size for mobile buttons */
+            }
+            .page-number {
+                font-size: 0.8em;
+                padding: 3px 8px;
+            }
+        }
+
+        /* Styles specific to flashcards, quizzes, and content sections (will be in individual page files) */
+        .flashcard-container { perspective: 1000px; margin-bottom: 15px; width: 100%; }
+        .flashcard { position: relative; width: 100%; height: auto; min-height: 100px; text-align: center; transition: transform 0.6s, height 0.6s ease-in-out; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); cursor: pointer; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: auto; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px; padding: 20px 25px; box-sizing: border-box; white-space: normal; line-height: 1.3; text-align: left; top: 0; left: 0; }
+        .flashcard-front { background-color: #e0f2fe; color: #1e40af; border: 1px solid #bfdbfe; font-size: 1.15em; font-weight: 600; justify-content: center; }
+        .flashcard-back { background-color: #a7f3d0; color: #065f46; border: 1px solid #6ee7b7; transform: rotateY(180deg); font-size: 1.15em; font-weight: 600; }
+        .topic-number { background-color: #60a5fa; color: #ffffff; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em; margin-right: 20px; flex-shrink: 0; }
+
+        .question-section { margin-bottom: 30px; padding: 20px; background-color: #e0f2fe; border-radius: 12px; border: 1px solid #bfdbfe; }
+        .question-text { font-size: 1.15em; font-weight: 600; color: #1e40af; margin-bottom: 15px; }
+        .option-label { display: block; background-color: #ffffff; padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; border: 1px solid #cbd5e1; }
+        .option-label:hover { background-color: #f0f4f8; border-color: #93c5fd; }
+        .option-label input[type="radio"], .option-label input[type="checkbox"] { margin-right: 10px; }
+        .feedback { margin-top: 10px; font-weight: bold; color: #dc2626; }
+        .feedback.correct { color: #10b981; }
+        .submit-button { background-color: #3b82f6; color: white; padding: 15px 30px; border-radius: 10px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; margin-top: 30px; border: none; display: block; width: fit-content; margin-left: auto; margin-right: auto; }
+        .submit-button:hover { background-color: #2563eb; }
+
+        .content-buttons-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .content-button { background-color: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; border: none; flex-grow: 1; text-align: center; max-width: calc(33% - 10px); }
+        .content-button:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .content-button.active { background-color: #059669; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        .content-section { background-color: #e0f2fe; border-radius: 12px; padding: 25px; border: 1px solid #bfdbfe; margin-top: 15px; line-height: 1.6; color: #1e40af; font-size: 1.05em; display: none; }
+        .content-section.active { display: block; }
+        .content-section ul { list-style-type: disc; margin-left: 20px; padding-left: 10px; }
+        .content-section ul ul { list-style-type: circle; margin-left: 20px; }
+        .content-section strong { color: #065f46; }
+
+        h1 {
+            font-size: 2.5rem; /* Smaller title on mobile */
+            margin-bottom: 30px;
+        }
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 3rem; /* Larger title on desktop */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container" class="page-container">
+        </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
